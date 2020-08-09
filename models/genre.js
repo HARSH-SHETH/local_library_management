@@ -6,7 +6,7 @@ var genreSchema = new Schema({
 });
 
 genreSchema.virtual('url').get(function(){
-  return '/Catalog/genre' + this._id;
+  return '/Catalog/genre/' + this._id;
 });
 
 // EXPORT MODULE

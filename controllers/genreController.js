@@ -2,7 +2,19 @@ var Genre = require('../models/genre');
 
 // Display list of all Genre.
 exports.genre_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre list');
+  Genre.find().sort([['name', 'ascending']]).exec(function(err, list_genres){
+    if(err) { return next(err); }
+    var new_genre_list = [];
+    var new_genre_list_name = [];
+    list_genres.forEach(function(genre){
+      if(new_genre_list_name.indexOf(genre.name) === -1){
+        new_genre_list_name.push(genre.name);
+        new_genre_list.push(genre);
+        console.log("harsh");
+      }
+    });
+    res.render('genre_list', { title: 'Genre List', list_genres: new_genre_list});
+  });
 };
 
 // Display detail page for a specific Genre.
