@@ -1,4 +1,6 @@
 var Author = require('../models/author.js');
+var Book = require('../models/book.js')
+var async = require('async');
 
 var authorObj = {
   // DISPLAY LIST OF ALL AUTHORS
@@ -9,7 +11,26 @@ var authorObj = {
     });
   }, 
   // DISPLAY DETAIL PAGE FOR A SPECIFIC AUTHOR
-  author_detail: function(req, res){ res.send('NOT IMPLEMENTED: Author detail: ' + req.params.id); }, 
+  author_detail: function(req, res, next){ 
+    async.parallel({
+      author: function(callback){
+        Author.findById(req.params.id).exec(callback);
+      }, 
+      authors_books: function(callback){
+        Book.find({'author': req.params.id}, 'title summary').exec(callback);
+      },
+
+    }, function(err, results){
+      if (err) { return next(err); }  // ERROR IN API USAGE
+      if (results.author == null) { 
+        var err = new Error('Author not found');
+        err.status = 404;
+        return next(err);
+      }
+    // SUCCESSFUL SO RENDER
+   res.render('author_detail', { title: 'Author Detail', author: results.author, author_books: results.authors_books });
+    });
+  }, 
   // DISPLAY AUTHOR CREATE FORM ON GET
   author_create_get: function(req, res){ res.send('NOT IMPLEMENTED: Author create GET'); }, 
   // HANDLE AUTHOR CREATE ON POST
